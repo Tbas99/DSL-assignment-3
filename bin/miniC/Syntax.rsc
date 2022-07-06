@@ -24,7 +24,7 @@ keyword ProgramSyntax
 	;
 
 // Define types
-lexical Type = "double" | "char" | "int";
+lexical Type = "double" | "string" | "int";
 
 // Define program constructs
 lexical ConstructKeyword 
