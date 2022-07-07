@@ -1,1 +1,1 @@
-module C::CST2AST
+module miniC::CST2AST

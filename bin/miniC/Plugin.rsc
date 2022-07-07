@@ -1,1 +1,1 @@
-module C::Plugin
+module miniC::Plugin
