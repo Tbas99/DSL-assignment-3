@@ -17,6 +17,8 @@ public Tree parseMiniCTree(loc l) {
 	return parse(#start[MiniC], l);
 }
 
+
+
 /*
  * Auxiliary functions
  */

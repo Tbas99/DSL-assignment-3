@@ -106,11 +106,11 @@ syntax IncludeBody
 	;
 
 syntax ParameterBody
-	= parameterBody: "(" Parameters* parameters ")"
+	= parameterBody: "(" Parameter* parameters ")"
 	;
 
-syntax Parameters
-	= parameters: "int" "argc" "," "char" "*" "argv[]"
+syntax Parameter
+	= parameter: "int" "argc" "," "char" "*" "argv[]"
 	;
 
 syntax MainBody 
@@ -126,15 +126,15 @@ syntax MainContent
 
 // Define the syntax for a programming construct
 syntax Construct
-	= ifElse: IfConstruct+ ifStatement ElseIfConstruct* elseifStatement ElseConstruct* elseStatement
-	| forLoop: ForLoopConstruct+ forLoopStatement
-	| whileLoop: WhileLoopConstruct+ whileLoopStatement
+	= ifElse: IfConstruct ifStatement ElseIfConstruct* elseifStatement ElseConstruct* elseStatement
+	| forLoop: ForLoopConstruct forLoopStatement
+	| whileLoop: WhileLoopConstruct whileLoopStatement
 	;
 
 // Construct body can again have either a statement or another construct
 syntax ConstructBody
-	= statement: Statement statement
-	| construct: Construct construct
+	= nestedStatement: Statement statement
+	| nestedConstruct: Construct construct
 	;
 
 
@@ -149,7 +149,7 @@ syntax ElseConstruct
 	= elseConstruct: "else" "{" ConstructBody* elseBody "}"
 	;
 syntax IfCondition
-	= equality: Comparison+ equalityComparison
+	= ifEquality: Comparison+ equalityComparison
 	;
 
 
@@ -158,12 +158,12 @@ syntax ForLoopConstruct
 	= forLoopConstruct: "for" "(" ForLoopCondition+ forLoopConditions ")" "{" ConstructBody* forLoopBody "}"
 	;
 syntax ForLoopCondition
-	= initialization: MultiVariableInitialization+ loopVariables ";"
-	| condition: Comparison+ inequality ";"
-	| update: Assignment+ // No closing ; for final expression
+	= initialization: ForLoopVariable+ loopVariables ";"
+	| condition: Comparison+ inequalities ";"
+	| update: Assignment+ loopUpdates // No closing ; for final expression
 	;
-syntax MultiVariableInitialization
-	= variable: Type+ variableType Identifier+ variableName "=" Value+ variableValue ","?
+syntax ForLoopVariable
+	= variable: Type variableType Identifier variableName "=" Value variableValue ","?
 	;
 
 
@@ -172,49 +172,50 @@ syntax WhileLoopConstruct
 	= whileLoopConstruct: "while" "(" WhileLoopCondition+ whileLoopConditions ")" "{" ConstructBody* whileLoopBody "}"
 	;
 syntax WhileLoopCondition
-	= equality: Comparison+ equalityComparison
+	= whileEquality: Comparison+ equalityComparison
 	;
 
 
 // Syntax related to different type of statements
 syntax Statement
-	= declaration: Declaration+ variableDeclaration ";"
-	| assignment: Assignment+ variableAssignment ";"
-	| functionCall: FunctionCall+ externalFunctionCall ";"
+	= declaration: Declaration variableDeclaration ";"
+	| assignment: Assignment variableAssignment ";"
+	| functionCall: FunctionCall externalFunctionCall ";"
 	;
 syntax Declaration
-	= declaration: Type+ variableType Identifier+ variableName
-	| declarationAssignment: Type+ variableType Assignment+ variableAssignment
+	= withoutAssignment: Type variableType Identifier variableName
+	| withAssignment: Type variableType Assignment variableAssignment
 	;
 syntax Assignment
-	= simple: Identifier+ variable "=" Value+ variableValue
-	| arithmetic: Identifier+ variable "=" Arithmetic+ arithmeticValue
-	| boolean: Identifier+ variable "=" Comparison+ booleanValue // Can also return a single function call
+	= simple: Identifier variable "=" Value variableValue
+	| arithmetic: Identifier variable "=" Arithmetic arithmeticValue
+	| boolean: Identifier variable "=" Comparison booleanValue // Can also return a single function call
 	;
 syntax FunctionCall
-	= function: Identifier+ functionName "(" FunctionParameters+ parameters ")"
+	= function: Identifier functionName "(" FunctionParameter+ parameters ")"
 	;
-syntax FunctionParameters
-	= parameter: Identifier+ parameterName ","?
+syntax FunctionParameter
+	= functionParameter: Identifier parameterName ","?
 	;
 
 
 // Syntax related to different kinds of operations
+// Optional TODO: Possibly have to add braces here
 syntax Comparison
-	= arithmetic: Arithmetic+ leftValue ComparisonOperator+ comparisonOperator Arithmetic+ rightValue
-	| logical: Comparison+ leftComparison LogicalOperator+ logicalOperator Comparison+ rightComparison
-	| negation: LogicalNegationOperator+ negation Comparison+ comparison
-	| function: FunctionCall+ functionCall // Functions can return comparisons!
+	= compArithmetic: Arithmetic leftValue ComparisonOperator comparisonOperator Arithmetic rightValue
+	| left compLogical: Comparison leftComparison LogicalOperator logicalOperator Comparison rightComparison
+	> left compNegation: LogicalNegationOperator negation Comparison comparison
+	| left compFunction: FunctionCall functionCall // Functions can return comparisons!
 	;
 syntax Arithmetic
-	= base: Value+ variableValue
-	| nested: Arithmetic+ leftEquation ArithmeticOperator+ arithmeticOperator Arithmetic+ rightEquation
+	= base: Value variableValue
+	| left nested: Arithmetic leftEquation ArithmeticOperator arithmeticOperator Arithmetic rightEquation
 	;
 
 
 // Define the possible values that could be present in some scopes
 syntax Value
-	= constant: Integer+ integerValue
-	| literal: String+ stringValue
-	| variable: Identifier+ variableName
+	= constant: Integer integerValue
+	| literal: String stringValue
+	| variable: Identifier variableName
 	;
