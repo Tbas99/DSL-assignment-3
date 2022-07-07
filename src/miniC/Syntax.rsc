@@ -5,8 +5,13 @@ module miniC::Syntax
  * The language specification can be found in the associated technical documentation.
  */
  
-// Take care of whitespace when parsing
-layout Whitespace = [\ \t\n\r]* !>> [\ \t\n\r];
+// Take care of whitespace and comments when parsing
+// We ignore comments due to the complexity of them, as they can appear anywhere in the program (similar to whitespaces)
+layout Layout
+     = (WhiteSpace | Comment)* !>> [\ \t\n\r] !>> "/*" !>> "//"
+     ;
+     
+lexical WhiteSpace = [\ \t\n\r];
 
 // Define standard string identifier
 lexical Identifier = [$ A-Z _ a-z] !<< IdentifierChars \ProgramSyntax !>> [$ 0-9 A-Z _ a-z];
@@ -25,7 +30,7 @@ keyword ProgramSyntax
 	
 /* Formats */
 lexical Integer = [0-9]+;
-lexical String = [a-zA-Z] >> [a-zA-Z0-9];
+lexical String = [a-zA-Z]+ >> [a-zA-Z0-9];
 lexical Double = [0-9]+("." [0-9]+)?;
 
 // Define types
@@ -56,6 +61,39 @@ lexical LogicalNegationOperator
 lexical IncludeLexical
 	= [a-zA-Z]+".h"
 	;
+	
+// Define lexicals for comments
+lexical Comment
+	= MultiLineComment
+	| EndOfLineComment
+	;
+lexical MultiLineComment
+	= "/*" CommentContent
+	;
+lexical EndOfLineComment
+	= "//" CommentCharacterContent* !>> [\n \r]
+	;
+lexical CommentContent
+	= "*" CommentStarContent
+	| NotStar
+	;
+lexical CommentStarContent
+	= "/"
+	| "*" CommentStarContent
+	| NotStarNorSlash CommentContent
+	;
+lexical NotStar
+	= CommentCharacterContent \ [*]
+	| [\n \r]
+	;
+lexical NotStarNorSlash
+	= CommentCharacterContent \ [* /]
+	| [\n \r]
+	;
+lexical CommentCharacterContent
+	= ![\\]
+	;
+	
 
 // We can have either a main method or includes in the root
 start syntax MiniC
@@ -84,6 +122,7 @@ syntax MainContent
 	| construct: Construct construct
 	| returnCall: "return" Integer returnValue ";"
 	;
+
 
 // Define the syntax for a programming construct
 syntax Construct
@@ -175,7 +214,7 @@ syntax Arithmetic
 
 // Define the possible values that could be present in some scopes
 syntax Value
-	= constant: Integer+
-	| literal: String+
-	| variable: Identifier+
+	= constant: Integer+ integerValue
+	| literal: String+ stringValue
+	| variable: Identifier+ variableName
 	;
