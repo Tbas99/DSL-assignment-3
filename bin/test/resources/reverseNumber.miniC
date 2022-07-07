@@ -1,13 +1,10 @@
-#include <stdio.h>
-
-// A program that reverses a given input number
 int main() {
     int n;
     int reverse = 0;
     int remainder;
 
     printf("Enter an integer: ");
-    scanf("%d", &n);
+    scanf("%d", n);
 
     while (n != 0) {
         remainder = n % 10;

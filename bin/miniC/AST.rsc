@@ -8,6 +8,11 @@ module miniC::AST
 public alias Label = str; // Identifiers
 
 // Root of a MiniC file
+public data AbsMiniCRoot
+	= root(list[AbsMiniC] miniCFile)
+	;
+
+// Contents of the root
 public data AbsMiniC
 	= mainDef(AbsParameterBody parameterBody, AbsMainBody mainBody)
 	| includeDef(AbsIncludeBody includeBody)
@@ -23,7 +28,7 @@ public data AbsParameterBody
 	= parameterBody(list[AbsParameter] parameters)
 	;
 public data AbsParameter
-	= parameter()
+	= parameter(str parameterValue)
 	;
 
 // Main method wrapper
@@ -107,7 +112,7 @@ public data AbsFunctionCall
 	= function(Label functionName, list[AbsFunctionParameter] parameters)
 	;
 public data AbsFunctionParameter
-	= functionParameter(Label parameterName)
+	= functionParameter(AbsValue parameterName)
 	;
 	
 // Wrappers for comparison/arithmetic operations

@@ -30,8 +30,14 @@ keyword ProgramSyntax
 	
 /* Formats */
 lexical Integer = [0-9]+;
-lexical String = [a-zA-Z]+ >> [a-zA-Z0-9];
+lexical String = (LetterOrDigit | WhiteSpace | SpecialSymbolsOccurInString)+;
 lexical Double = [0-9]+("." [0-9]+)?;
+lexical SpecialSymbolsOccurInString 
+	= ";" | ":" | "&" | "^" | "#" | "!" | "?" | "%" | "="
+	;
+keyword ForbiddenSymbols
+	= "\"" | ":"
+	;
 
 // Define types
 lexical Type = "double" | "string" | "int";
@@ -94,11 +100,14 @@ lexical CommentCharacterContent
 	= ![\\]
 	;
 	
+start syntax MiniCRoot
+	= root: MiniC+ miniCFile
+	;
 
 // We can have either a main method or includes in the root
-start syntax MiniC
+syntax MiniC
 	= mainDef: "int" "main" ParameterBody parameterBody MainBody mainBody
-	| includeDef: "#include" IncludeBody+ includeBody
+	| includeDef: "#include" IncludeBody includeBody
 	;
 	
 syntax IncludeBody
@@ -110,7 +119,7 @@ syntax ParameterBody
 	;
 
 syntax Parameter
-	= parameter: "int" "argc" "," "char" "*" "argv[]"
+	= parameter: "int" "argc" "," "string" "argv"
 	;
 
 syntax MainBody 
@@ -195,7 +204,7 @@ syntax FunctionCall
 	= function: Identifier functionName "(" FunctionParameter+ parameters ")"
 	;
 syntax FunctionParameter
-	= functionParameter: Identifier parameterName ","?
+	= functionParameter: Value parameterName ","?
 	;
 
 
@@ -216,6 +225,6 @@ syntax Arithmetic
 // Define the possible values that could be present in some scopes
 syntax Value
 	= constant: Integer integerValue
-	| literal: String stringValue
 	| variable: Identifier variableName
+	> literal: "\"" String stringValue "\"" // A string value between quotes
 	;

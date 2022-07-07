@@ -35,7 +35,7 @@ public start[MiniC] parseMiniCString(str txt, bool allowAmbiguity) {
 }
 
 // Parse basic example
-public start[MiniC] parseExampleMiniC() {
+public start[MiniCRoot] parseExampleMiniC() {
 	loc src = |project://DSLD2022/src/test/resources/reverseNumber.miniC|;
-	return parse(#start[MiniC], src);
+	return parse(#start[MiniCRoot], src, allowAmbiguity=true);
 }

@@ -8,15 +8,15 @@ import miniC::Syntax;
 import util::ValueUI;
 
 public void determineAmbiguity(Tree t) {
-	text(diagnose(t), 4); // indentation level is 4
+	text(diagnose(t), 4);
 	//print(diagnose(t));
 }
 
 
 /* Auxiliary function for debugging */
-public void cst2astDebug(start[MiniC] miniC) {
+public void cst2astDebug(start[MiniCRoot] miniC) {
 	try 
-		implode(#MiniC, miniC);
+		implode(#MiniCRoot, miniC);
 	catch IllegalArgument(_, m): 
 		println(m);
 	
