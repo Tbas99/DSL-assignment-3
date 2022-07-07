@@ -1,1 +1,1 @@
-module C::AST
+module miniC::AST

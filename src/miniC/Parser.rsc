@@ -1,1 +1,1 @@
-module C::Parser
+module miniC::Parser

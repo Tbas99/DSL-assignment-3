@@ -1,1 +1,1 @@
-module C::Check
+module miniC::Check
