@@ -110,10 +110,7 @@ syntax ElseConstruct
 	= elseConstruct: "else" "{" ConstructBody* elseBody "}"
 	;
 syntax IfCondition
-	= arithmetic: Value+ leftValue ArithmeticOperator+ arithmeticOperator Value+ rightValue
-	| comparison: Value+ leftValue ComparisonOperator+ comparisonOperator Value+ rightValue
-	| logicalComparison: IfCondition+ leftCondition LogicalOperator+ logicalOperator IfCondition+ rightCondition
-	| logicalNegation: LogicalNegationOperator+ negationOperator IfCondition+ condition
+	= equality: Comparison+ equalityComparison
 	;
 
 
@@ -124,7 +121,7 @@ syntax ForLoopConstruct
 syntax ForLoopCondition
 	= initialization: MultiVariableInitialization+ loopVariables ";"
 	| condition: Comparison+ inequality ";"
-	| update: Value+ //left here
+	| update: Assignment+ // No closing ; for final expression
 	;
 syntax MultiVariableInitialization
 	= variable: Type+ variableType Identifier+ variableName "=" Value+ variableValue ","?
@@ -133,45 +130,52 @@ syntax MultiVariableInitialization
 
 // Syntax related to while loop statements
 syntax WhileLoopConstruct
-	= whileLoopConstruct: "while" "(" Statement+ whileLoopConditions ")" "{" ConstructBody* "}"
+	= whileLoopConstruct: "while" "(" WhileLoopCondition+ whileLoopConditions ")" "{" ConstructBody* whileLoopBody "}"
+	;
+syntax WhileLoopCondition
+	= equality: Comparison+ equalityComparison
 	;
 
 
 // Syntax related to different type of statements
 syntax Statement
-	= declaration: Declaration+ variableDeclaration
-	| assignment:
-	| functionCall:
+	= declaration: Declaration+ variableDeclaration ";"
+	| assignment: Assignment+ variableAssignment ";"
+	| functionCall: FunctionCall+ externalFunctionCall ";"
 	;
-	
 syntax Declaration
-	= declaration: Type+ variableType Identifier+ variableName ";"
-	| declarationAssignment: Type+ variableType Identifier+ variableName "=" ";"
+	= declaration: Type+ variableType Identifier+ variableName
+	| declarationAssignment: Type+ variableType Assignment+ variableAssignment
 	;
-	
-	
 syntax Assignment
-	= simple: Identifier+ variable "=" Value+ variableValueSimple
-	| complex: Identifier+ variable "=" Arithmetic+ variableValueComplex
+	= simple: Identifier+ variable "=" Value+ variableValue
+	| arithmetic: Identifier+ variable "=" Arithmetic+ arithmeticValue
+	| boolean: Identifier+ variable "=" Comparison+ booleanValue // Can also return a single function call
+	;
+syntax FunctionCall
+	= function: Identifier+ functionName "(" FunctionParameters+ parameters ")"
+	;
+syntax FunctionParameters
+	= parameter: Identifier+ parameterName ","?
 	;
 
+
+// Syntax related to different kinds of operations
 syntax Comparison
-	= operation: Value+ leftValue ComparisonOperator+ comparisonOperator Value+ rightValue
+	= arithmetic: Arithmetic+ leftValue ComparisonOperator+ comparisonOperator Arithmetic+ rightValue
+	| logical: Comparison+ leftComparison LogicalOperator+ logicalOperator Comparison+ rightComparison
+	| negation: LogicalNegationOperator+ negation Comparison+ comparison
+	| function: FunctionCall+ functionCall // Functions can return comparisons!
 	;
 syntax Arithmetic
-	= operation: Value+ leftValue ArithmeticOperator+ arithmeticOperator Value+ rightValue
+	= base: Value+ variableValue
 	| nested: Arithmetic+ leftEquation ArithmeticOperator+ arithmeticOperator Arithmetic+ rightEquation
 	;
-syntax Operation
-	= compare: Comparison+ comparison
-	| math: Arithmetic+ arithmetic
-	;
 
 
-// Define the possible values that could be present
+// Define the possible values that could be present in some scopes
 syntax Value
 	= constant: Integer+
 	| literal: String+
 	| variable: Identifier+
 	;
-	
