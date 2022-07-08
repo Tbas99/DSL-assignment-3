@@ -102,8 +102,7 @@ public data AbsDeclaration
 	
 // Assignment wrapper
 public data AbsAssignment
-	= simple(Label variableName, str assignmentOperator, AbsPossibleValue variableValue)
-	| arithmetic(Label variableName, str assignmentOperator, AbsArithmetic arithmeticValue)
+	= arithmetic(Label variableName, str assignmentOperator, AbsArithmetic arithmeticValue)
 	| boolean(Label variableName, str assignmentOperator, AbsComparison booleanValue)
 	;
 

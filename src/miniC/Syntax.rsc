@@ -30,11 +30,8 @@ keyword ProgramSyntax
 	
 /* Formats */
 lexical Integer = [0-9]+;
-lexical String = (LetterOrDigit | WhiteSpace | SpecialSymbolsOccurInString)+;
+lexical String = "\"" (![\"])+ "\""; // A string body can contain anything but its closing quotes
 lexical Double = [0-9]+("." [0-9]+)?;
-lexical SpecialSymbolsOccurInString 
-	= ";" | ":" | "&" | "^" | "#" | "!" | "?" | "%" | "="
-	;
 keyword ForbiddenSymbols
 	= "\"" | ":"
 	;
@@ -197,8 +194,7 @@ syntax Declaration
 	| withAssignment: Type variableType Assignment variableAssignment
 	;
 syntax Assignment
-	= simple: Identifier variableName AssignmentOperator assignmentOperator PossibleValue variableValue
-	| arithmetic: Identifier variableName AssignmentOperator assignmentOperator Arithmetic arithmeticValue
+	= arithmetic: Identifier variableName AssignmentOperator assignmentOperator Arithmetic arithmeticValue
 	| boolean: Identifier variableName AssignmentOperator assignmentOperator Comparison booleanValue // Can also return a single function call
 	;
 syntax FunctionCall
@@ -227,5 +223,5 @@ syntax Arithmetic
 syntax PossibleValue
 	= constant: Integer integerValue
 	| variable: Identifier variableName
-	> literal: "\"" String stringValue "\"" // A string value between quotes
+	> literal: String stringValue // A string value between quotes
 	;

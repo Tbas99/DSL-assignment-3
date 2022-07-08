@@ -3,7 +3,6 @@ module miniC::CST2AST
 import miniC::Syntax;
 import miniC::AST;
 import String;
-import IO;
 
 /*
  * Maps Concrete MiniC Syntax to Abstract Syntax
@@ -88,7 +87,7 @@ public AbsMainContent mapFileConstruct(MainContent mainConstruct) {
 			return statement(mapFileConstruct(statemnt));
 		case (MainContent)`<Construct constrt>`:
 			return construct(mapFileConstruct(constrt));
-		case (MainContent)`return <Integer returnValue>`:
+		case (MainContent)`return <Integer returnValue>;`:
 			return returnCall(mapDataTypes(returnValue));
 		default:
 			throw "No such construct exists";
@@ -263,14 +262,11 @@ public list[AbsAssignment] mapFileConstructs(Assignment+ assignments) {
 	return abstractAssignments;
 }
 public AbsAssignment mapFileConstruct(Assignment assignment) {
-	print(assignment);
 	switch(assignment) {
-		case (Assignment)`<Identifier variableName> <AssignmentOperator assignmentOperator> <PossibleValue variableValue>`:
-			return simple("<variableName>", "<assignmentOperator>", mapFileConstruct(variableValue));
-		case (Assignment)`<Identifier variable> <AssignmentOperator assignmentOperator> <Arithmetic arithmeticValue>`:
-			return arithmetic("<variable>", "<assignmentOperator>", mapFileConstruct(arithmeticValue));
-		case (Assignment)`<Identifier variable> <AssignmentOperator assignmentOperator> <Comparison booleanValue>`:
-			return boolean("<variable>", "<assignmentOperator>", mapFileConstruct(booleanValue));
+		case (Assignment)`<Identifier variableName> <AssignmentOperator assignmentOperator> <Arithmetic arithmeticValue>`:
+			return arithmetic("<variableName>", "<assignmentOperator>", mapFileConstruct(arithmeticValue));
+		case (Assignment)`<Identifier variableName> <AssignmentOperator assignmentOperator> <Comparison booleanValue>`:
+			return boolean("<variableName>", "<assignmentOperator>", mapFileConstruct(booleanValue));
 		default:
 			throw "No such construct exists";
 	}
