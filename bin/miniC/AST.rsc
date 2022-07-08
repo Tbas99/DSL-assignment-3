@@ -76,7 +76,7 @@ public data AbsForLoopCondition
 	| update(list[AbsAssignment] loopUpdates)
 	;
 public data AbsForLoopVariable
-	= variable(str variableType, Label variableName, AbsValue variableValue)
+	= variable(str variableType, Label variableName, AbsPossibleValue variableValue)
 	;
 
 // While loop construct
@@ -102,9 +102,9 @@ public data AbsDeclaration
 	
 // Assignment wrapper
 public data AbsAssignment
-	= simple(Label variable, AbsValue variableValue)
-	| arithmetic(Label variable, AbsArithmetic arithmeticValue)
-	| boolean(Label variable, AbsComparison booleanValue)
+	= simple(Label variableName, str assignmentOperator, AbsPossibleValue variableValue)
+	| arithmetic(Label variableName, str assignmentOperator, AbsArithmetic arithmeticValue)
+	| boolean(Label variableName, str assignmentOperator, AbsComparison booleanValue)
 	;
 
 // Function call wrapper
@@ -112,7 +112,7 @@ public data AbsFunctionCall
 	= function(Label functionName, list[AbsFunctionParameter] parameters)
 	;
 public data AbsFunctionParameter
-	= functionParameter(AbsValue parameterName)
+	= functionParameter(AbsPossibleValue parameterName)
 	;
 	
 // Wrappers for comparison/arithmetic operations
@@ -123,12 +123,12 @@ public data AbsComparison
 	| compFunction(AbsFunctionCall functionCall)
 	;
 public data AbsArithmetic
-	= base(AbsValue variableValue)
+	= base(AbsPossibleValue variableValue)
 	| nested(AbsArithmetic leftEquation, str arithmeticOperator, AbsArithmetic rightEquation)
 	;
 	
 // Wrapper for different kind of values we can encounter
-public data AbsValue
+public data AbsPossibleValue
 	= constant(int integerValue)
 	| literal(str stringValue)
 	| variable(Label variableName)

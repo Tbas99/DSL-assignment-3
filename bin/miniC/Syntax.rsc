@@ -62,6 +62,7 @@ lexical LogicalOperator
 lexical LogicalNegationOperator
 	= "!"
 	;
+lexical AssignmentOperator = "=";
 
 // Define separate import lexical as 'types' could be used in the name
 lexical IncludeLexical
@@ -152,7 +153,7 @@ syntax IfConstruct
 	= ifConstruct: "if" "(" IfCondition+ ifConditions ")" "{" ConstructBody* ifBody "}"
 	;
 syntax ElseIfConstruct
-	= elseIfConstruct: "else" IfConstruct+ elseifStatement
+	= elseIfConstruct: "else" IfConstruct+ elseifStatements
 	;
 syntax ElseConstruct
 	= elseConstruct: "else" "{" ConstructBody* elseBody "}"
@@ -172,7 +173,7 @@ syntax ForLoopCondition
 	| update: Assignment+ loopUpdates // No closing ; for final expression
 	;
 syntax ForLoopVariable
-	= variable: Type variableType Identifier variableName "=" Value variableValue ","?
+	= variable: Type variableType Identifier variableName "=" PossibleValue variableValue ","?
 	;
 
 
@@ -196,15 +197,15 @@ syntax Declaration
 	| withAssignment: Type variableType Assignment variableAssignment
 	;
 syntax Assignment
-	= simple: Identifier variable "=" Value variableValue
-	| arithmetic: Identifier variable "=" Arithmetic arithmeticValue
-	| boolean: Identifier variable "=" Comparison booleanValue // Can also return a single function call
+	= simple: Identifier variableName AssignmentOperator assignmentOperator PossibleValue variableValue
+	| arithmetic: Identifier variableName AssignmentOperator assignmentOperator Arithmetic arithmeticValue
+	| boolean: Identifier variableName AssignmentOperator assignmentOperator Comparison booleanValue // Can also return a single function call
 	;
 syntax FunctionCall
 	= function: Identifier functionName "(" FunctionParameter+ parameters ")"
 	;
 syntax FunctionParameter
-	= functionParameter: Value parameterName ","?
+	= functionParameter: PossibleValue parameterName ","?
 	;
 
 
@@ -217,13 +218,13 @@ syntax Comparison
 	| left compFunction: FunctionCall functionCall // Functions can return comparisons!
 	;
 syntax Arithmetic
-	= base: Value variableValue
+	= base: PossibleValue variableValue
 	| left nested: Arithmetic leftEquation ArithmeticOperator arithmeticOperator Arithmetic rightEquation
 	;
 
 
 // Define the possible values that could be present in some scopes
-syntax Value
+syntax PossibleValue
 	= constant: Integer integerValue
 	| variable: Identifier variableName
 	> literal: "\"" String stringValue "\"" // A string value between quotes
