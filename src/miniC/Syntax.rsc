@@ -167,7 +167,7 @@ syntax ForLoopConstruct
 syntax ForLoopCondition
 	= initialization: ForLoopVariable+ loopVariables ";"
 	| condition: Comparison+ inequalities ";"
-	| update: Assignment+ loopUpdates // No closing ; for final expression
+	| update: Assignment+ loopUpdates ";"? // Optional closing ; since assignment can also be done in first expression
 	;
 syntax ForLoopVariable
 	= variable: Type variableType Identifier variableName "=" PossibleValue variableValue ","?

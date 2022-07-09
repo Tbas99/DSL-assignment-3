@@ -192,6 +192,8 @@ public AbsForLoopCondition mapFileConstruct(ForLoopCondition forLoopCondition) {
 			return initialization(mapFileConstructs(loopVariables));
 		case (ForLoopCondition)`<Comparison+ inequalities>;`:
 			return condition(mapFileConstructs(inequalities));
+		case (ForLoopCondition)`<Assignment+ loopUpdates>;`:
+			return update(mapFileConstructs(loopUpdates));
 		case (ForLoopCondition)`<Assignment+ loopUpdates>`:
 			return update(mapFileConstructs(loopUpdates));
 		default:
