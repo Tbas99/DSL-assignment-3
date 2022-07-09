@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <external.h>
 
+// Test program
 int main() {
     int n;
     int reverse = 0;

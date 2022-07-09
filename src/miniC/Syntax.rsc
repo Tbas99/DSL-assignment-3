@@ -68,36 +68,11 @@ lexical IncludeLexical
 	
 // Define lexicals for comments
 lexical Comment
-	= MultiLineComment
-	| EndOfLineComment
+	= "//" ![\n]+ [\n] // Single-line comment
+	| "/*" ![/]+ "*/" // Multi-line comment
 	;
-lexical MultiLineComment
-	= "/*" CommentContent
-	;
-lexical EndOfLineComment
-	= "//" CommentCharacterContent* !>> [\n \r]
-	;
-lexical CommentContent
-	= "*" CommentStarContent
-	| NotStar
-	;
-lexical CommentStarContent
-	= "/"
-	| "*" CommentStarContent
-	| NotStarNorSlash CommentContent
-	;
-lexical NotStar
-	= CommentCharacterContent \ [*]
-	| [\n \r]
-	;
-lexical NotStarNorSlash
-	= CommentCharacterContent \ [* /]
-	| [\n \r]
-	;
-lexical CommentCharacterContent
-	= ![\\]
-	;
-	
+
+// Define the root of a .miniC file
 start syntax MiniCRoot
 	= root: MiniC+ miniCFile
 	;

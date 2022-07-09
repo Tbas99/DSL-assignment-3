@@ -1,5 +1,9 @@
 #include <stdio.h>
 
+/* Program that computes the factorial of an input
+ * Input is a integer
+ * Output is a integer
+ */
 int main() {
     int n;
     int i;
@@ -7,6 +11,7 @@ int main() {
     printf("Enter an integer: ");
     scanf("%d", n);
 
+	// check something here
     if (n < 0) {
         printf("Error! Factorial of a negative number doesn't exist.");
     }
