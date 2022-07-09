@@ -173,10 +173,11 @@ syntax Assignment
 	| boolean: Identifier variableName AssignmentOperator assignmentOperator Comparison booleanValue // Can also return a single function call
 	;
 syntax FunctionCall
-	= function: Identifier functionName "(" FunctionParameter+ parameters ")"
+	= function: Identifier functionName "(" FunctionParameter* parameters ")"
 	;
 syntax FunctionParameter
 	= functionParameter: PossibleValue parameterName ","?
+	| nestedFunctionCall: FunctionCall functionCall ","? // Cannot list in PossibleValue due to ambiguity
 	;
 
 

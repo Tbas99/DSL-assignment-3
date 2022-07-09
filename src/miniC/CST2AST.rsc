@@ -280,17 +280,25 @@ public AbsFunctionCall mapFileConstruct(FunctionCall call) {
 		
 	return abstractFunctionCall;
 }
-public list[AbsFunctionParameter] mapFileConstructs(FunctionParameter+ params) {
+public list[AbsFunctionParameter] mapFileConstructs(FunctionParameter* params) {
 	list[AbsFunctionParameter] abstractFunctionParameters =
 		[mapFileConstruct(construct) | (FunctionParameter construct <- params)];
 		
 	return abstractFunctionParameters;
 }
 public AbsFunctionParameter mapFileConstruct(FunctionParameter parameter) {
-	AbsFunctionParameter abstractFunctionParameter =
-		functionParameter(mapFileConstruct(parameter.parameterName));
-		
-	return abstractFunctionParameter;
+	switch(parameter) {
+		case (FunctionParameter)`<PossibleValue parameterName>,`:
+			return functionParameter(mapFileConstruct(parameterName));
+		case (FunctionParameter)`<PossibleValue parameterName>`:
+			return functionParameter(mapFileConstruct(parameterName));
+		case (FunctionParameter)`<FunctionCall functionCall>,`:
+			return nestedFunctionCall(mapFileConstruct(functionCall));
+		case (FunctionParameter)`<FunctionCall functionCall>`:
+			return nestedFunctionCall(mapFileConstruct(functionCall));
+		default:
+			throw "No such construct exists";
+	}
 }
 
 // Comparison operation
