@@ -3,6 +3,7 @@
 int main()
 {
     int y;
+    int k = ((6+3)/5) - 3;
 
     printf("Enter year: ");
     scanf("%d", y);
