@@ -188,7 +188,7 @@ public list[AbsForLoopCondition] mapFileConstructs(ForLoopCondition+ forLoopCond
 }
 public AbsForLoopCondition mapFileConstruct(ForLoopCondition forLoopCondition) {
 	switch(forLoopCondition) {
-		case (ForLoopCondition)`<ForLoopVariable+ loopVariables>;`: // Not sure if this works
+		case (ForLoopCondition)`<ForLoopVariable+ loopVariables>;`:
 			return initialization(mapFileConstructs(loopVariables));
 		case (ForLoopCondition)`<Comparison+ inequalities>;`:
 			return condition(mapFileConstructs(inequalities));
@@ -208,7 +208,7 @@ public list[AbsForLoopVariable] mapFileConstructs(ForLoopVariable+ loopVariables
 }
 public AbsForLoopVariable mapFileConstruct(ForLoopVariable loopVariable) {
 	AbsForLoopVariable abstractForLoopVariable =
-		variable("<loopVariable.variableType>", "<loopVariable.variableName>", mapFileConstruct(loopVariable.variableValue));
+		forLoopVariable("<loopVariable.variableType>", "<loopVariable.variableName>", mapFileConstruct(loopVariable.variableValue));
 		
 	return abstractForLoopVariable;
 }

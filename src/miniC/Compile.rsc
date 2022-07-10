@@ -90,6 +90,8 @@ Statement extractAssignment(AbsAssignment ass) {
 	if (arithmetic(Label variableName, str assignmentOperator, AbsArithmetic arithmeticValue) := ass) {
 		// Return the arithmatic operation performed
 		return Assign([Name(variableName, Store())], extractArithmatic(arithmeticValue));
+	} else if (boolean(Label variableName, str assignmentOperator, AbsComparison booleanValue) := ass) {
+		return Assign([Name(variableName, Store())], extractComparison(booleanValue));
 	}
 	throw "Failed to convert miniC AST to Python AST";
 }
@@ -117,6 +119,19 @@ Statement extractStatement(AbsStatement statement) {
 	throw "Failed to convert miniC AST to Python AST";
 }
 
+BinOp extractBinOp(str operator) {
+	switch (operator) {
+		case "&&":
+			return And();
+		case "||":
+			return Or();
+		case "!":
+			return Not();
+		default:
+			throw "Unknown operator: " + operator;
+	}
+}
+
 CmpOp extractCmpOp(str operator) {
 	switch (operator) {
 		case "\<":
@@ -132,13 +147,17 @@ CmpOp extractCmpOp(str operator) {
 		case "!=":
 			return NotEq();
 		default:
-			throw "Failed to convert miniC AST to Python AST";
+			throw "Unknown operator: " + operator;
 	}
 }
 
 Expression extractComparison(AbsComparison comparison) {
 	if (compArithmetic(AbsArithmetic leftValue, str comparisonOperator, AbsArithmetic rightValue) := comparison) {
 		return Compare(extractArithmatic(leftValue), [extractCmpOp(comparisonOperator)], [extractArithmatic(rightValue)]);
+	} else if (compLogical(AbsComparison leftComparison, str logicalOperator, AbsComparison rightComparison) := comparison) {
+		return BoolOp(extractBinOp(logicalOperator), [extractComparison(leftComparison), extractComparison(rightComparison)]);
+	} else if (compNegation(str negation, AbsComparison comp) := comparison) {
+		return UnaryOp(extractBinOp(negation), extractComparison(comp)); 
 	}
 	throw "Failed to convert miniC AST to Python AST";
 }
@@ -148,6 +167,24 @@ Statement extractBody(AbsConstructBody body) {
 		return extractStatement(statement);
 	} else if (nestedConstruct(AbsConstruct construct) := body) {
 		return extractConstruct(construct);
+	}
+	throw "Failed to convert miniC AST to Python AST";
+}
+
+Statement extractForLoop(AbsForLoopConstruct construct) {
+	// The for-loop is rewritten as a while-loop for easier compilation
+	if (forLoopConstruct(list[AbsForLoopCondition] cond, list[AbsConstructBody] forLoopBody) := construct) {
+		if (initialization(list[AbsForLoopVariable] init) := cond[0] && condition(list[AbsComparison] cmp) := cond[1] && update(list[AbsAssignment] loopUpdates) := cond[2]) {
+			// We construct a while-loop to parse the C-style for loop
+			Expression expr = extractComparison(cmp[0]);
+			list[Statement] body = [ extractBody(B) | AbsConstructBody B <- forLoopBody ] + extractAssignment(loopUpdates[0]);
+			if (forLoopVariable(str _, Label variableName, AbsPossibleValue variableValue) := init[0]) {
+				// We return an always-true if-statement to add the initialization before the while loop
+				Statement initialize = Assign([Name(variableName, Store())], extractValue(variableValue));
+				Statement loop = While(expr, body, []);
+				return If(Constant(1), [initialize, loop], []);
+			}
+		}
 	}
 	throw "Failed to convert miniC AST to Python AST";
 }
@@ -168,7 +205,9 @@ Statement extractWhileLoop(AbsWhileLoopConstruct construct) {
 
 Statement extractConstruct(AbsConstruct construct) {
 	// Check the construct and return it
-	if (whileLoop(AbsWhileLoopConstruct whileLoopStatement) := construct) {
+	if (forLoop(AbsForLoopConstruct forLoopStatement) := construct) {
+		return extractForLoop(forLoopStatement);
+	} else if (whileLoop(AbsWhileLoopConstruct whileLoopStatement) := construct) {
 		return extractWhileLoop(whileLoopStatement);
 	}
 	throw "Failed to convert miniC AST to Python AST";

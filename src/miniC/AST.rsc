@@ -76,7 +76,7 @@ public data AbsForLoopCondition
 	| update(list[AbsAssignment] loopUpdates)
 	;
 public data AbsForLoopVariable
-	= variable(str variableType, Label variableName, AbsPossibleValue variableValue)
+	= forLoopVariable(str variableType, Label variableName, AbsPossibleValue variableValue)
 	;
 
 // While loop construct
@@ -112,7 +112,7 @@ public data AbsFunctionCall
 	;
 public data AbsFunctionParameter
 	= functionParameter(AbsPossibleValue parameterName)
-	| nestedFunctionCall(AbsFunctionCall functionCall) // Future support
+	| nestedFunctionCall(AbsFunctionCall functionCall) // Not supported when compiling
 	;
 	
 // Wrappers for comparison/arithmetic operations
@@ -120,7 +120,7 @@ public data AbsComparison
 	= compArithmetic(AbsArithmetic leftValue, str comparisonOperator, AbsArithmetic rightValue)
 	| compLogical(AbsComparison leftComparison, str logicalOperator, AbsComparison rightComparison)
 	| compNegation(str negation, AbsComparison comparison)
-	| compFunction(AbsFunctionCall functionCall)
+	| compFunction(AbsFunctionCall functionCall) // Not supported when compiling
 	;
 public data AbsArithmetic
 	= base(AbsPossibleValue variableValue)
