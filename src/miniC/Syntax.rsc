@@ -31,10 +31,7 @@ keyword ProgramSyntax
 /* Formats */
 lexical Integer = [0-9]+;
 lexical String = "\"" (![\"])+ "\""; // A string body can contain anything but its closing quotes
-lexical Double = [0-9]+("." [0-9]+)?;
-keyword ForbiddenSymbols
-	= "\"" | ":"
-	;
+lexical Double = [0-9]+("." [0-9]+);
 
 // Define types
 lexical Type = "double" | "string" | "int";
@@ -68,36 +65,11 @@ lexical IncludeLexical
 	
 // Define lexicals for comments
 lexical Comment
-	= MultiLineComment
-	| EndOfLineComment
+	= "//" ![\n]+ [\n] // Single-line comment
+	| "/*" ![/]+ "*/" // Multi-line comment
 	;
-lexical MultiLineComment
-	= "/*" CommentContent
-	;
-lexical EndOfLineComment
-	= "//" CommentCharacterContent* !>> [\n \r]
-	;
-lexical CommentContent
-	= "*" CommentStarContent
-	| NotStar
-	;
-lexical CommentStarContent
-	= "/"
-	| "*" CommentStarContent
-	| NotStarNorSlash CommentContent
-	;
-lexical NotStar
-	= CommentCharacterContent \ [*]
-	| [\n \r]
-	;
-lexical NotStarNorSlash
-	= CommentCharacterContent \ [* /]
-	| [\n \r]
-	;
-lexical CommentCharacterContent
-	= ![\\]
-	;
-	
+
+// Define the root of a .miniC file
 start syntax MiniCRoot
 	= root: MiniC+ miniCFile
 	;
@@ -167,7 +139,7 @@ syntax ForLoopConstruct
 syntax ForLoopCondition
 	= initialization: ForLoopVariable+ loopVariables ";"
 	| condition: Comparison+ inequalities ";"
-	| update: Assignment+ loopUpdates // No closing ; for final expression
+	| update: Assignment+ loopUpdates ";"? // Optional closing ; since assignment can also be done in first expression
 	;
 syntax ForLoopVariable
 	= variable: Type variableType Identifier variableName "=" PossibleValue variableValue ","?
@@ -198,10 +170,11 @@ syntax Assignment
 	| boolean: Identifier variableName AssignmentOperator assignmentOperator Comparison booleanValue // Can also return a single function call
 	;
 syntax FunctionCall
-	= function: Identifier functionName "(" FunctionParameter+ parameters ")"
+	= function: Identifier functionName "(" FunctionParameter* parameters ")"
 	;
 syntax FunctionParameter
 	= functionParameter: PossibleValue parameterName ","?
+	| nestedFunctionCall: FunctionCall functionCall ","? // Cannot list in PossibleValue due to ambiguity
 	;
 
 
@@ -215,13 +188,15 @@ syntax Comparison
 	;
 syntax Arithmetic
 	= base: PossibleValue variableValue
+	| braces: "(" Arithmetic equation ")"
 	| left nested: Arithmetic leftEquation ArithmeticOperator arithmeticOperator Arithmetic rightEquation
 	;
 
 
 // Define the possible values that could be present in some scopes
 syntax PossibleValue
-	= constant: Integer integerValue
+	= integer: Integer integerValue
+	| double: Double doubleValue
 	| variable: Identifier variableName
-	> literal: String stringValue // A string value between quotes
+	> string: String stringValue // A string value between quotes
 	;

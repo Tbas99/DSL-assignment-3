@@ -192,6 +192,8 @@ public AbsForLoopCondition mapFileConstruct(ForLoopCondition forLoopCondition) {
 			return initialization(mapFileConstructs(loopVariables));
 		case (ForLoopCondition)`<Comparison+ inequalities>;`:
 			return condition(mapFileConstructs(inequalities));
+		case (ForLoopCondition)`<Assignment+ loopUpdates>;`:
+			return update(mapFileConstructs(loopUpdates));
 		case (ForLoopCondition)`<Assignment+ loopUpdates>`:
 			return update(mapFileConstructs(loopUpdates));
 		default:
@@ -278,17 +280,25 @@ public AbsFunctionCall mapFileConstruct(FunctionCall call) {
 		
 	return abstractFunctionCall;
 }
-public list[AbsFunctionParameter] mapFileConstructs(FunctionParameter+ params) {
+public list[AbsFunctionParameter] mapFileConstructs(FunctionParameter* params) {
 	list[AbsFunctionParameter] abstractFunctionParameters =
 		[mapFileConstruct(construct) | (FunctionParameter construct <- params)];
 		
 	return abstractFunctionParameters;
 }
 public AbsFunctionParameter mapFileConstruct(FunctionParameter parameter) {
-	AbsFunctionParameter abstractFunctionParameter =
-		functionParameter(mapFileConstruct(parameter.parameterName));
-		
-	return abstractFunctionParameter;
+	switch(parameter) {
+		case (FunctionParameter)`<PossibleValue parameterName>,`:
+			return functionParameter(mapFileConstruct(parameterName));
+		case (FunctionParameter)`<PossibleValue parameterName>`:
+			return functionParameter(mapFileConstruct(parameterName));
+		case (FunctionParameter)`<FunctionCall functionCall>,`:
+			return nestedFunctionCall(mapFileConstruct(functionCall));
+		case (FunctionParameter)`<FunctionCall functionCall>`:
+			return nestedFunctionCall(mapFileConstruct(functionCall));
+		default:
+			throw "No such construct exists";
+	}
 }
 
 // Comparison operation
@@ -318,6 +328,8 @@ public AbsArithmetic mapFileConstruct(Arithmetic arithmetic) {
 	switch(arithmetic) {
 		case (Arithmetic)`<PossibleValue variableValue>`:
 			return base(mapFileConstruct(variableValue));
+		case (Arithmetic)`(<Arithmetic equation>)`:
+			return braces(mapFileConstruct(equation));
 		case (Arithmetic)`<Arithmetic leftEquation> <ArithmeticOperator operator> <Arithmetic rightEquation>`:
 			return nested(mapFileConstruct(leftEquation), "<operator>", mapFileConstruct(rightEquation));
 		default:
@@ -329,11 +341,13 @@ public AbsArithmetic mapFileConstruct(Arithmetic arithmetic) {
 public AbsPossibleValue mapFileConstruct(PossibleValue val) {
 	switch(val) {
 		case (PossibleValue)`<Integer integerValue>`:
-			return constant(mapDataTypes(integerValue));
+			return integer(mapDataTypes(integerValue));
+		case (PossibleValue)`<Double doubleValue>`:
+			return double(mapDataTypes(doubleValue));
 		case (PossibleValue)`<Identifier variableName>`:
 			return variable("<variableName>");
 		case (PossibleValue)`<String stringValue>`:
-			return literal("<stringValue>");
+			return string("<stringValue>");
 		default:
 			throw "No such construct exists";
 	}
@@ -342,4 +356,7 @@ public AbsPossibleValue mapFileConstruct(PossibleValue val) {
 // Concrete Datatype to rascal primitive conversion
 public int mapDataTypes(Integer intgr) {
 	return toInt("<intgr>");
+}
+public real mapDataTypes(Double dbl) {
+	return toReal("<dbl>");
 }

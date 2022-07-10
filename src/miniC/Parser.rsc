@@ -10,12 +10,12 @@ import ParseTree;
  * Example of loc definition: loc src = |project://DSL-Design-2022-Assignment-3/src/test/resources/reverseNumber.miniC|;
  * Example of loc definition: loc src = |project://DSLD2022/src/test/resources/reverseNumber.miniC|;
  */
-public start[MiniC] parseMiniC(loc l) {
-	return parse(#start[MiniC], l);
+public start[MiniCRoot] parseMiniC(loc l) {
+	return parse(#start[MiniCRoot], l);
 }
 
 public Tree parseMiniCTree(loc l) {
-	return parse(#start[MiniC], l);
+	return parse(#start[MiniCRoot], l);
 }
 
 
@@ -25,14 +25,14 @@ public Tree parseMiniCTree(loc l) {
  */
 
 // Parse ambigious example
-public start[MiniC] parseAmb() {
+public start[MiniCRoot] parseAmb() {
 	loc src = |project://DSL-Design-2022-Assignment-3/src/test/resources/factorial.miniC|;
-	return parse(#start[MiniC], src, allowAmbiguity=true);
+	return parse(#start[MiniCRoot], src, allowAmbiguity=true);
 }
 
 // Parsing string instead of loc (for troubleshooting purposes hence the parameter allowAmbiguity)
-public start[MiniC] parseMiniCString(str txt, bool allowAmbiguity) {
-	return parse(#start[MiniC], txt, allowAmbiguity=allowAmbiguity);
+public start[MiniCRoot] parseMiniCString(str txt, bool allowAmbiguity) {
+	return parse(#start[MiniCRoot], txt, allowAmbiguity=allowAmbiguity);
 }
 
 // Parse basic example
