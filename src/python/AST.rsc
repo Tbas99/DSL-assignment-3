@@ -89,9 +89,9 @@ data Expression
   ;
 
 // Can appear only in Subscript
-data Expression 
-  = \slice(Maybe[Expression] lower, Maybe[Expression] upper, Maybe[Expression] step)
-  ;
+//data Expression 
+//  = \slice(Maybe[Expression] lower, Maybe[Expression] upper, Maybe[Expression] step)
+//  ;
 
 // Binary operators
 data Calculation
@@ -124,56 +124,56 @@ data ExprContext
   = Store()
   | \Load()
   
-  | del()
+  //| del()
   ;
 
-data Conversion 
-  = noFormatting()
-  | stringFormatting()
-  | reprFormatting()
-  | asciiFormatting()
-  ;
+//data Conversion 
+//  = noFormatting()
+//  | stringFormatting()
+//  | reprFormatting()
+//  | asciiFormatting()
+//  ;
 
-data CmpOp 
-  = eq() 
-  | noteq() 
-  | lt() 
-  | lte() 
-  | gt() 
-  | gte() 
-  | is() 
-  | isnot() 
-  | \in() 
-  | \notin()
-  ;
+//data CmpOp 
+//  = eq() 
+//  | noteq() 
+//  | lt() 
+//  | lte() 
+//  | gt() 
+//  | gte() 
+//  | is() 
+//  | isnot() 
+//  | \in() 
+//  | \notin()
+//  ;
 
-data Comprehension = comprehension(Expression target, Expression iter, list[Expression] ifs, bool isAsync);
+//data Comprehension = comprehension(Expression target, Expression iter, list[Expression] ifs, bool isAsync);
 
-data ExceptHandler(loc src = |unknown:///|) 
-  = exceptHandler(Maybe[Expression] \type, Maybe[Identifier] optName, list[Statement] body);
+//data ExceptHandler(loc src = |unknown:///|) 
+//  = exceptHandler(Maybe[Expression] \type, Maybe[Identifier] optName, list[Statement] body);
 
-data Arguments 
-  = arguments(
-      list[Arg] posonlyargs, 
-      list[Arg] args, 
-      Maybe[Arg] varargs, 
-      list[Arg] kwonlyargs, 
-      list[Expression] kw_defaults, 
-      Maybe[Arg] kwarg, 
-      list[Expression] defaults
-  );
+//data Arguments 
+//  = arguments(
+//      list[Arg] posonlyargs, 
+//      list[Arg] args, 
+//      Maybe[Arg] varargs, 
+//      list[Arg] kwonlyargs, 
+//      list[Expression] kw_defaults, 
+//      Maybe[Arg] kwarg, 
+//      list[Expression] defaults
+//  );
 
-data Arg(loc src = |unknown:///|) 
-  = arg(Identifier arg, Maybe[Expression] annotation, Maybe[str] typeComment);
+//data Arg(loc src = |unknown:///|) 
+//  = arg(Identifier arg, Maybe[Expression] annotation, Maybe[str] typeComment);
 
-data Keyword(loc src = |unknown:///|) 
-  = \keyword(Maybe[Identifier] arg, Expression \value);
+//data Keyword(loc src = |unknown:///|) 
+//  = \keyword(Maybe[Identifier] arg, Expression \value);
 
-data Alias 
-  = \alias(Identifier name, Maybe[Identifier] asName);
+//data Alias 
+//  = \alias(Identifier name, Maybe[Identifier] asName);
 
-data WithItem 
-  = withItem(Expression contextExpr, Maybe[Expression] optionalVars);
+//data WithItem 
+//  = withItem(Expression contextExpr, Maybe[Expression] optionalVars);
 
 data TypeIgnore 
   = typeIgnore(int lineno, str \tag);
