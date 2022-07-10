@@ -124,12 +124,14 @@ public data AbsComparison
 	;
 public data AbsArithmetic
 	= base(AbsPossibleValue variableValue)
+	| braces(AbsArithmetic equation)
 	| nested(AbsArithmetic leftEquation, str arithmeticOperator, AbsArithmetic rightEquation)
 	;
 	
 // Wrapper for different kind of values we can encounter
 public data AbsPossibleValue
-	= constant(int integerValue)
-	| literal(str stringValue)
+	= integer(int integerValue)
+	| double(real doubleValue)
+	| string(str stringValue)
 	| variable(Label variableName)
 	;

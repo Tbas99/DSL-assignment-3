@@ -15,3 +15,8 @@ public void checkHardwareConfiguration() {
 	AbsMiniCRoot abstractMiniCRoot = cst2ast(miniCRoot);
 	print(abstractMiniCRoot);
 }
+
+// Check if variables are assigned correct values according to their type
+public void checkVariableTypes(AbsMiniCRoot root) {
+
+}

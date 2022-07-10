@@ -31,10 +31,7 @@ keyword ProgramSyntax
 /* Formats */
 lexical Integer = [0-9]+;
 lexical String = "\"" (![\"])+ "\""; // A string body can contain anything but its closing quotes
-lexical Double = [0-9]+("." [0-9]+)?;
-keyword ForbiddenSymbols
-	= "\"" | ":"
-	;
+lexical Double = [0-9]+("." [0-9]+);
 
 // Define types
 lexical Type = "double" | "string" | "int";
@@ -191,13 +188,15 @@ syntax Comparison
 	;
 syntax Arithmetic
 	= base: PossibleValue variableValue
+	| braces: "(" Arithmetic equation ")"
 	| left nested: Arithmetic leftEquation ArithmeticOperator arithmeticOperator Arithmetic rightEquation
 	;
 
 
 // Define the possible values that could be present in some scopes
 syntax PossibleValue
-	= constant: Integer integerValue
+	= integer: Integer integerValue
+	| double: Double doubleValue
 	| variable: Identifier variableName
-	> literal: String stringValue // A string value between quotes
+	> string: String stringValue // A string value between quotes
 	;
