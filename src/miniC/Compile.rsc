@@ -6,10 +6,10 @@ import IO;
 import python::AST;
 
 Expression extractValue(AbsPossibleValue variableValue) {
-	if (constant(int integerValue) := variableValue) {
+	if (integer(int integerValue) := variableValue) {
 		// Return the corresponding value as an integer
 		return Constant(integerValue);
-	} else if (literal(str stringValue) := variableValue) {
+	} else if (string(str stringValue) := variableValue) {
 		// Return the corresponding value as a string
 		return Constant(stringValue);
 	} else if (variable(Label variableName) := variableValue) {
@@ -105,6 +105,10 @@ Statement extractContent(AbsMainContent content) {
 	// Check the type of statement and extract the corresponding value
 	if (statement(AbsStatement stat) := content) {
 		return extractStatement(stat);
+	}
+	
+	else if (returnCall(int returnValue) := content) {
+		return Expr(Call(Name("exit", Load()), [Constant(returnValue)], []));
 	}
 	throw "Failed to convert miniC AST to Python AST";
 }
