@@ -1,0 +1,1 @@
+Module([Assign([Name("n",Store())],Constant("None")),Assign([Name("reverse",Store())],Constant(0)),Assign([Name("remainder",Store())],Constant("None")),Expr(Call(Name("print",Load()),[Constant("\"Enter an integer: \"")],[])),Assign([Name("n",Store())],Call(Name("input",Load()),[],[])),Expr(Call(Name("exit",Load()),[Constant(1)],[]))],[])
