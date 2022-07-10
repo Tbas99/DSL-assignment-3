@@ -58,9 +58,18 @@ Statement extractFuntion(AbsFunctionCall func) {
 			}
 		} else if (functionName == "scanf") {
 			// Only 2-argument scanf is supported
-			if (functionParameter(AbsPossibleValue parameterName) := params[1]) {
-				if (variable(Label variableName) := parameterName) {
-					return Assign([Name(variableName, Store())], Call(Name("input", Load()), [], []));			
+			if (functionParameter(AbsPossibleValue param1) := params[0] && functionParameter(AbsPossibleValue param2) := params[1]) {
+				if (string(Label var1) := param1 && variable(Label var2) := param2) {
+					switch (var1) {
+						case "\"%d\"":
+							return Assign([Name(var2, Store())], Call(Name("int", Load()), [Call(Name("input", Load()), [], [])], []));							
+						case "\"%s\"":
+							return Assign([Name(var2, Store())], Call(Name("input", Load()), [], []));					
+						case "\"%f\"":
+							return Assign([Name(var2, Store())], Call(Name("float", Load()), [Call(Name("input", Load()), [], [])], []));		
+						default:
+							throw "Unknown variable type: " + var1;
+					}	
 				}
 			}
 		}
@@ -97,7 +106,63 @@ Statement extractStatement(AbsStatement statement) {
 	} else if (functionCall(AbsFunctionCall func) := statement) {
 		return extractFuntion(func);
 	}
-	// If the statement is unknown, throw exception
+	throw "Failed to convert miniC AST to Python AST";
+}
+
+CmpOp extractCmpOp(str operator) {
+	switch (operator) {
+		case "\<":
+			return Lt();
+		case "\>":
+			return Gt();
+		case "\<=":
+			return LtE();
+		case "\>=":
+			return GtE();
+		case "==":
+			return Eq();
+		case "!=":
+			return NotEq();
+		default:
+			throw "Failed to convert miniC AST to Python AST";
+	}
+}
+
+Expression extractComparison(AbsComparison comparison) {
+	if (compArithmetic(AbsArithmetic leftValue, str comparisonOperator, AbsArithmetic rightValue) := comparison) {
+		return Compare(extractArithmatic(leftValue), [extractCmpOp(comparisonOperator)], [extractArithmatic(rightValue)]);
+	}
+	throw "Failed to convert miniC AST to Python AST";
+}
+
+Statement extractBody(AbsConstructBody body) {
+	if (nestedStatement(AbsStatement statement) := body) {
+		return extractStatement(statement);
+	} else if (nestedConstruct(AbsConstruct construct) := body) {
+		return extractConstruct(construct);
+	}
+	throw "Failed to convert miniC AST to Python AST";
+}
+
+Statement extractWhileLoop(AbsWhileLoopConstruct construct) {
+	if (whileLoopConstruct(list[AbsWhileLoopCondition] conditions, list[AbsConstructBody] body) := construct) {
+		// Extract the condition
+		if (whileEquality(list[AbsComparison] equalityComparison) := conditions[0]) {
+			Expression expr = extractComparison(equalityComparison[0]);
+			list[Statement] pyBody = [ extractBody(B) | AbsConstructBody B <- body ];
+			// Return the constructed while loop
+			return While(expr, pyBody, []);
+		}
+		throw "Failed to convert miniC AST to Python AST";
+	}
+	throw "Failed to convert miniC AST to Python AST";
+}
+
+Statement extractConstruct(AbsConstruct construct) {
+	// Check the construct and return it
+	if (whileLoop(AbsWhileLoopConstruct whileLoopStatement) := construct) {
+		return extractWhileLoop(whileLoopStatement);
+	}
 	throw "Failed to convert miniC AST to Python AST";
 }
 
@@ -105,9 +170,9 @@ Statement extractContent(AbsMainContent content) {
 	// Check the type of statement and extract the corresponding value
 	if (statement(AbsStatement stat) := content) {
 		return extractStatement(stat);
-	}
-	
-	else if (returnCall(int returnValue) := content) {
+	} else if(construct(AbsConstruct construct) := content) {
+		return extractConstruct(construct);
+	} else if (returnCall(int returnValue) := content) {
 		return Expr(Call(Name("exit", Load()), [Constant(returnValue)], []));
 	}
 	throw "Failed to convert miniC AST to Python AST";

@@ -10,6 +10,7 @@ data AbsModule(loc src=|unknown:///|)
 data Statement(loc src=|unknown:///|)
   = Assign(list[Expression] targets, Expression \val)
   | Expr(Expression \value)
+  | \While(Expression \test, list[Statement] body, list[Statement] orElse)
   
   //| \return(Maybe[Expression] optValue)
   //| delete(list[Expression] targets)
@@ -29,7 +30,6 @@ data Statement(loc src=|unknown:///|)
   //| annAssign(Expression target, Expression annotation, Maybe[Expression] optValue, bool simple)
   //| \for(Expression target, Expression iter, list[Statement] body, list[Statement] orElse, Maybe[str] typeComment)
   //| asyncFor(Expression target, Expression iter, list[Statement] body, list[Statement] orElse, Maybe[str] typeComment)
-  //| \while(Expression \test, list[Statement] body, list[Statement] orElse)
   //| \if(Expression \test, list[Statement] body, list[Statement] orElse)
   //| with(list[WithItem] items, list[Statement] body, Maybe[str] typeComment)  
   //| asyncWith(list[WithItem] items, list[Statement] body, Maybe[str] typeComment)
@@ -56,7 +56,8 @@ data Expression(loc src=|unknown:///|)
 data Expression
   = Constant(str \strValue)
   | Constant(int \intValue)
-  | Call(Expression func, list[Expression] args, list[Keyword] keywords);
+  | Call(Expression func, list[Expression] args, list[Keyword] keywords)
+  | Compare(Expression lhs, list[CmpOp] ops, list[Expression] comparators);
   
   //| namedExpr(Expression target, Expression \value)
   //| ifExp(Expression \test, Expression body, Expression orelse)
@@ -69,7 +70,6 @@ data Expression
   //| await(Expression \value)
   //| yield(Maybe[Expression] optValue)
   //| yieldFrom(Expression \value)
-  //| compare(Expression lhs, list[CmpOp] ops, list[Expression] comparators)
   //| formattedValue(Expression \value, Maybe[Conversion] conversion, Maybe[Expression] formatSpec)
   //| joinedStr(list[Expression] values)
   //| lambda(Arguments formals, Expression body)
@@ -134,18 +134,14 @@ data ExprContext
 //  | asciiFormatting()
 //  ;
 
-//data CmpOp 
-//  = eq() 
-//  | noteq() 
-//  | lt() 
-//  | lte() 
-//  | gt() 
-//  | gte() 
-//  | is() 
-//  | isnot() 
-//  | \in() 
-//  | \notin()
-//  ;
+data CmpOp 
+  = Eq() 
+  | NotEq() 
+  | Lt() 
+  | LtE() 
+  | Gt() 
+  | GtE()
+  ;
 
 //data Comprehension = comprehension(Expression target, Expression iter, list[Expression] ifs, bool isAsync);
 
@@ -166,8 +162,8 @@ data ExprContext
 //data Arg(loc src = |unknown:///|) 
 //  = arg(Identifier arg, Maybe[Expression] annotation, Maybe[str] typeComment);
 
-//data Keyword(loc src = |unknown:///|) 
-//  = \keyword(Maybe[Identifier] arg, Expression \value);
+data Keyword(loc src = |unknown:///|) 
+  = \keyword(Maybe[Identifier] arg, Expression \value);
 
 //data Alias 
 //  = \alias(Identifier name, Maybe[Identifier] asName);
