@@ -11,6 +11,7 @@ data Statement(loc src=|unknown:///|)
   = Assign(list[Expression] targets, Expression \val)
   | Expr(Expression \value)
   | \While(Expression \test, list[Statement] body, list[Statement] orElse)
+  | \If(Expression \test, list[Statement] body, list[Statement] orElse)
   
   //| \return(Maybe[Expression] optValue)
   //| delete(list[Expression] targets)
