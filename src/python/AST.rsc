@@ -47,6 +47,7 @@ data Statement(loc src=|unknown:///|)
 
 data Expression(loc src=|unknown:///|)
   = BinOp(Expression lhs, Calculation calc, Expression rhs)
+  | ExprBetweenBraces(Expression expr)
   
   
   //| and(list[Expression] values)
@@ -56,6 +57,7 @@ data Expression(loc src=|unknown:///|)
 data Expression
   = Constant(str \strValue)
   | Constant(int \intValue)
+  | Constant(real \doubleValue)
   | Call(Expression func, list[Expression] args, list[Keyword] keywords)
   | Compare(Expression lhs, list[CmpOp] ops, list[Expression] comparators);
   

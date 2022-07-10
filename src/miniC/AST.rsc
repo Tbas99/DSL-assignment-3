@@ -112,7 +112,7 @@ public data AbsFunctionCall
 	;
 public data AbsFunctionParameter
 	= functionParameter(AbsPossibleValue parameterName)
-	| nestedFunctionCall(AbsFunctionCall functionCall)
+	| nestedFunctionCall(AbsFunctionCall functionCall) // Future support
 	;
 	
 // Wrappers for comparison/arithmetic operations
