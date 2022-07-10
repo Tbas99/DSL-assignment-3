@@ -29,9 +29,9 @@ keyword ProgramSyntax
 	;
 	
 /* Formats */
-lexical Integer = [0-9]+;
+lexical Integer = "-"?[0-9]+;
 lexical String = "\"" (![\"])+ "\""; // A string body can contain anything but its closing quotes
-lexical Double = [0-9]+("." [0-9]+);
+lexical Double = "-"?[0-9]+("." [0-9]+);
 
 // Define types
 lexical Type = "double" | "string" | "int";
