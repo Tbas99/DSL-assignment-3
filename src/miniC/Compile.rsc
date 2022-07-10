@@ -196,16 +196,28 @@ Statement extractIfElse(AbsIfConstruct ifStatement, list[AbsElseIfConstruct] els
 Statement extractForLoop(AbsForLoopConstruct construct) {
 	// The for-loop is rewritten as a while-loop for easier compilation
 	if (forLoopConstruct(list[AbsForLoopCondition] cond, list[AbsConstructBody] forLoopBody) := construct) {
-		if (initialization(list[AbsForLoopVariable] init) := cond[0] && condition(list[AbsComparison] cmp) := cond[1] && update(list[AbsAssignment] loopUpdates) := cond[2]) {
+		// Extract the initialization
+		Statement initialize;
+		if (initialization(list[AbsForLoopVariable] init) := cond[0]) {
+			if (forLoopVariable(str _, Label variableName, AbsPossibleValue variableValue) := init[0]) {
+				initialize = Assign([Name(variableName, Store())], extractValue(variableValue));
+			} else {
+				throw "Failed to convert miniC AST to Python AST";
+			}
+		} else if (update(list[AbsAssignment] init) := cond[0]) {
+			initialize = extractAssignment(init[0]);
+		} else {
+			throw "Failed to convert miniC AST to Python AST";
+		}
+		
+		// Construct the loop
+		if (condition(list[AbsComparison] cmp) := cond[1] && update(list[AbsAssignment] loopUpdates) := cond[2]) {
 			// We construct a while-loop to parse the C-style for loop
 			Expression expr = extractComparison(cmp[0]);
 			list[Statement] body = [ extractBody(B) | AbsConstructBody B <- forLoopBody ] + extractAssignment(loopUpdates[0]);
-			if (forLoopVariable(str _, Label variableName, AbsPossibleValue variableValue) := init[0]) {
-				// We return an always-true if-statement to add the initialization before the while loop
-				Statement initialize = Assign([Name(variableName, Store())], extractValue(variableValue));
-				Statement loop = While(expr, body, []);
-				return If(Constant(1), [initialize, loop], []);
-			}
+			// We return an always-true if-statement to add the initialization before the while loop
+			Statement loop = While(expr, body, []);
+			return If(Constant(1), [initialize, loop], []);
 		}
 	}
 	throw "Failed to convert miniC AST to Python AST";

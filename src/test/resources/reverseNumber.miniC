@@ -1,13 +1,15 @@
 int main() {
-    int n = 0;
-
-    if (n > 0) {
-    	printf("> 0");
-    } else if (n < 0) {
-    	printf("< 0");
-    } else if (0 == 1) {
-    	printf("< 0");
-    } else {
-    	printf("else");
-    }
+	int i;
+	int j;
+	int rows;
+	
+	printf("Enter the number of rows: ");
+	scanf("%d", rows);
+	for (i = 1; i <= rows; i = i + 1) {
+		for (j = 1; j <= i; j = j + 1) {
+			printf("* ");
+		}
+		printf("\n");
+	}
+	return 0;
 }
