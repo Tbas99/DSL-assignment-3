@@ -47,6 +47,7 @@ data Statement(loc src=|unknown:///|)
 
 data Expression(loc src=|unknown:///|)
   = BinOp(Expression lhs, Calculation calc, Expression rhs)
+  | ExprBetweenBraces(Expression expr)
   
   
   //| and(list[Expression] values)
@@ -56,6 +57,7 @@ data Expression(loc src=|unknown:///|)
 data Expression
   = Constant(str \strValue)
   | Constant(int \intValue)
+  | Constant(real \doubleValue)
   | Call(Expression func, list[Expression] args, list[Keyword] keywords);
   
   //| namedExpr(Expression target, Expression \value)
@@ -166,8 +168,8 @@ data ExprContext
 //data Arg(loc src = |unknown:///|) 
 //  = arg(Identifier arg, Maybe[Expression] annotation, Maybe[str] typeComment);
 
-//data Keyword(loc src = |unknown:///|) 
-//  = \keyword(Maybe[Identifier] arg, Expression \value);
+data Keyword(loc src = |unknown:///|) 
+  = \keyword(Maybe[Identifier] arg, Expression \value);
 
 //data Alias 
 //  = \alias(Identifier name, Maybe[Identifier] asName);

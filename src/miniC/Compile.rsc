@@ -2,6 +2,7 @@ module miniC::Compile
 
 import miniC::AST;
 import IO;
+import List;
 
 import python::AST;
 
@@ -15,6 +16,9 @@ Expression extractValue(AbsPossibleValue variableValue) {
 	} else if (variable(Label variableName) := variableValue) {
 		// Return the corresponding value as a load
 		return Name(variableName, Load());
+	} else if (double(real doubleValue) := variableValue) {
+		// Return the corresponding value as an double
+		return Constant(doubleValue);
 	}
 	throw "Failed to convert miniC AST to Python AST";
 }
@@ -44,6 +48,9 @@ Expression extractArithmatic(AbsArithmetic arithmatic) {
 	} else if (nested(AbsArithmetic leftEquation, str arithmeticOperator, AbsArithmetic rightEquation) := arithmatic) {
 		// Return the nested calculation
 		return BinOp(extractArithmatic(leftEquation), extractCalculation(arithmeticOperator), extractArithmatic(rightEquation));
+	} else if (braces(AbsArithmetic equation) := arithmatic) {
+		// Return the equation between braces
+		return ExprBetweenBraces(extractArithmatic(equation));
 	}
 	throw "Failed to convert miniC AST to Python AST";
 }
@@ -51,12 +58,13 @@ Expression extractArithmatic(AbsArithmetic arithmatic) {
 Statement extractFuntion(AbsFunctionCall func) {
 	// Return the corresponding function
 	if (function(Label functionName, list[AbsFunctionParameter] params) := func) {
-		if (functionName == "printf") {
+		// Use rascal List size function to get params
+		if (functionName == "printf" && size(params) == 1) {
 			// Only 1-argument printf is supported
 			if (functionParameter(AbsPossibleValue parameterName) := params[0]) {
 				return Expr(Call(Name("print", Load()), [extractValue(parameterName)], []));
 			}
-		} else if (functionName == "scanf") {
+		} else if (functionName == "scanf" && size(params) == 2) {
 			// Only 2-argument scanf is supported
 			if (functionParameter(AbsPossibleValue parameterName) := params[1]) {
 				if (variable(Label variableName) := parameterName) {
@@ -64,7 +72,7 @@ Statement extractFuntion(AbsFunctionCall func) {
 				}
 			}
 		}
-		throw "Unknown function: " + functionName;
+		throw "Unknown function: " + functionName + ". Either the number of parameters are invalid or the function is undefined.";
 	}
 	throw "Failed to convert miniC AST to Python AST";
 }
@@ -116,11 +124,17 @@ Statement extractContent(AbsMainContent content) {
 public AbsModule compileProgram(AbsMiniCRoot miniC){
 	if (root(list[AbsMiniC] miniCFile) := miniC) {
 		// Extract only the body from the miniC file
-		if (mainDef(AbsParameterBody parameterBody, AbsMainBody body) := miniCFile[0]) {
-			if (mainBody(list[AbsMainContent] mainContent) := body) {
-				// On each part of the body, extract the content
-				list[Statement] statements = [ extractContent(C) | AbsMainContent C <- mainContent ];
-				return \Module(statements, []);
+		for (int n <- [0 .. size(miniCFile)]) {
+			switch (miniCFile[n]) {
+				case mainDef(_, AbsMainBody body): {
+					if (mainBody(list[AbsMainContent] mainContent) := body) {
+						// On each part of the body, extract the content
+						list[Statement] statements = [ extractContent(C) | AbsMainContent C <- mainContent ];
+						return \Module(statements, []);
+					}
+				}
+				case includeDef(_):
+					print("Includes are not supported yet for Python compilation.");
 			}
 		}
 	}
