@@ -203,12 +203,47 @@ Statement extractWhileLoop(AbsWhileLoopConstruct construct) {
 	throw "Failed to convert miniC AST to Python AST";
 }
 
+Statement extractIfElse(AbsIfConstruct ifStatement, list[AbsElseIfConstruct] elseifStatement, list[AbsElseConstruct] elseStatement) {
+	Expression rootCondition = extractIfCondition(ifStatement);
+	list[Statement] rootBody = extractIfBody(ifStatement);
+	
+	// Now recursively create the elif statements
+	int nrOfElifStatements = size(elseifStatement);
+	if (nrOfElifStatements > 0) {
+		list[Statement] elifs = [ extractIfElse(B) | AbsIfConstruct B <- elseifStatement[0] ];
+	} else {
+		list[Statement] elifs = [ extractBody(B) | AbsConstructBody B <- elseStatement ];
+	}
+	
+	return If(rootCondition, rootBody, elifs);
+}
+Expression extractIfCondition(AbsIfConstruct ifStatement) {
+	if (ifConstruct(list[AbsIfCondition] ifConditions, list[AbsConstructBody] ifBody) := ifStatement) {
+		// Extract the condition
+		if (ifEquality(list[AbsComparison] equalityComparison) := ifConditions[0]) {
+			return extractComparison(equalityComparison[0]);
+		}
+	}
+	throw "Failed to convert miniC AST to Python AST";
+}
+list[Statement] extractIfBody(AbsIfConstruct ifStatement) {
+	if (ifConstruct(list[AbsIfCondition] ifConditions, list[AbsConstructBody] ifBody) := ifStatement) {
+		// Extract the condition
+		if (ifEquality(list[AbsComparison] equalityComparison) := ifConditions[0]) {
+			return [ extractBody(B) | AbsConstructBody B <- ifBody ];
+		}
+	}
+	throw "Failed to convert miniC AST to Python AST";
+}
+
 Statement extractConstruct(AbsConstruct construct) {
 	// Check the construct and return it
 	if (forLoop(AbsForLoopConstruct forLoopStatement) := construct) {
 		return extractForLoop(forLoopStatement);
 	} else if (whileLoop(AbsWhileLoopConstruct whileLoopStatement) := construct) {
 		return extractWhileLoop(whileLoopStatement);
+	} else if (ifElse(AbsIfConstruct ifStatement, list[AbsElseIfConstruct] elseifStatement, list[AbsElseConstruct] elseStatement) := construct) {
+		return extractIfElse(ifStatement, elseifStatement, elseStatement);
 	}
 	throw "Failed to convert miniC AST to Python AST";
 }

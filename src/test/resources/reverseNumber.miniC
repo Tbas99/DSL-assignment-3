@@ -6,14 +6,15 @@ int main() {
     printf("Enter an integer: ");
     scanf("%d", n);
 
-    while (n != 0) {
-        remainder = n % 10;
-        reverse = reverse * 10 + remainder;
-        n = n / 10;
+    if (n > 0) {
+    	n = 1;
+    } else if (n < 0) {
+    	n = 2;
+    } else if (n == 0) {
+    	n = 3;
+    } else {
+    	n = 3;
     }
-
-    printf("Reversed number = ");
-    printf(reverse);
 
     return 0;
 }
