@@ -15,7 +15,7 @@ import python::AST;
  * Well-formedness checker
  */
 
-public bool checkWellFormedness(AbsMiniCRoot root) {
+public bool checkLogicConstraints(AbsMiniCRoot root) {
 	return (checkValidityDeclaration(root) && checkValidityManipulation(root));
 }
 
