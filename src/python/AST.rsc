@@ -31,7 +31,6 @@ data Statement(loc src=|unknown:///|)
   //| annAssign(Expression target, Expression annotation, Maybe[Expression] optValue, bool simple)
   //| \for(Expression target, Expression iter, list[Statement] body, list[Statement] orElse, Maybe[str] typeComment)
   //| asyncFor(Expression target, Expression iter, list[Statement] body, list[Statement] orElse, Maybe[str] typeComment)
-  //| \if(Expression \test, list[Statement] body, list[Statement] orElse)
   //| with(list[WithItem] items, list[Statement] body, Maybe[str] typeComment)  
   //| asyncWith(list[WithItem] items, list[Statement] body, Maybe[str] typeComment)
   //| raise(Maybe[Expression] exc, Maybe[Expression] cause)
@@ -48,6 +47,8 @@ data Statement(loc src=|unknown:///|)
 
 data Expression(loc src=|unknown:///|)
   = BinOp(Expression lhs, Calculation calc, Expression rhs)
+  | BoolOp(BinOp op, list[Expression] exps)
+  | UnaryOp(BinOp op, Expression exp)
   | ExprBetweenBraces(Expression expr)
   
   
@@ -145,6 +146,12 @@ data CmpOp
   | Gt() 
   | GtE()
   ;
+  
+data BinOp
+ = Or()
+ | And()
+ | Not()
+ ;
 
 //data Comprehension = comprehension(Expression target, Expression iter, list[Expression] ifs, bool isAsync);
 
