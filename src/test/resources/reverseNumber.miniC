@@ -5,8 +5,8 @@ int main() {
     	printf("> 0");
     } else if (n < 0) {
     	printf("< 0");
-    } else if (n == 0) {
-    	printf("== 0");
+    } else if (0 == 1) {
+    	printf("< 0");
     } else {
     	printf("else");
     }
