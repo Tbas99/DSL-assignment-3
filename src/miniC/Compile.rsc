@@ -1,6 +1,7 @@
 module miniC::Compile
 
 import miniC::AST;
+import miniC::Check;
 import IO;
 import List;
 
@@ -262,6 +263,11 @@ Statement extractContent(AbsMainContent content) {
 }
 
 public AbsModule compileProgram(AbsMiniCRoot miniC){
+	// Well-formedness check before compilation
+	if (checkLogicConstraints(miniC) == false) {
+		throw "Failed well-formedness check";
+	}
+
 	if (root(list[AbsMiniC] miniCFile) := miniC) {
 		// Extract only the body from the miniC file
 		for (int n <- [0 .. size(miniCFile)]) {
