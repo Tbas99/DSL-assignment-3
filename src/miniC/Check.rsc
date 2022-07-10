@@ -26,6 +26,10 @@ public bool checkValidityDeclaration(AbsMiniCRoot root) {
 	visit(root) {
 		case withAssignment(str variableType, AbsAssignment variableAssignment): {
 			correctDeclaration = correctAssignmentReturnType(variableAssignment, variableType);
+			
+			if (correctDeclaration == false) {
+				return false;
+			}
 		}
 	}
 	
@@ -43,7 +47,14 @@ public bool checkValidityManipulation(AbsMiniCRoot root) {
 			case withoutAssignment(str variableType, Label variableName): {
 				for (/arithmetic(Label equationVar, _, AbsArithmetic arithmeticValue) := root) {
 					if (variableName == equationVar) {
+						print(variableName);
+						print(arithmeticValue);
+						print(variableType);
 						correctVariableTreatment = correctArithmeticReturnType(arithmeticValue, variableType);
+						
+						if (correctVariableTreatment == false) {
+							return false;
+						}
 					}
 				}
 			}
@@ -51,6 +62,10 @@ public bool checkValidityManipulation(AbsMiniCRoot root) {
 				for (/arithmetic(Label equationVar, _, AbsArithmetic arithmeticValue) := root) {
 					if (variableAssignment.variableName == equationVar) {
 						correctVariableTreatment = correctArithmeticReturnType(arithmeticValue, variableType);
+						
+						if (correctVariableTreatment == false) {
+							return false;
+						}
 					}
 				}
 			}
