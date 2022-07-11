@@ -33,7 +33,7 @@ data Expression
   | Compare(Expression lhs, list[CmpOp] ops, list[Expression] comparators)
   ;
 
-// Initialization
+// Variable usage
 data Expression
   = Name(Identifier id, ExprContext ctx)
   ;
