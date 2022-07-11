@@ -47,9 +47,6 @@ public bool checkValidityManipulation(AbsMiniCRoot root) {
 			case withoutAssignment(str variableType, Label variableName): {
 				for (/arithmetic(Label equationVar, _, AbsArithmetic arithmeticValue) := root) {
 					if (variableName == equationVar) {
-						print(variableName);
-						print(arithmeticValue);
-						print(variableType);
 						correctVariableTreatment = correctArithmeticReturnType(arithmeticValue, variableType);
 						
 						if (correctVariableTreatment == false) {
