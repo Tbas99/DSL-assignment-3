@@ -16,7 +16,7 @@ import python::AST;
  */
 
 public bool checkLogicConstraints(AbsMiniCRoot root) {
-	return (checkValidityDeclaration(root) && checkValidityManipulation(root));
+	return (checkValidityDeclaration(root) && checkValidityManipulation(root) && checkVariablesInitialization(root));
 }
 
 // Check if variables are assigned correct values according to their type at declaration
@@ -70,6 +70,41 @@ public bool checkValidityManipulation(AbsMiniCRoot root) {
 	}
 
 	return correctVariableTreatment;
+}
+
+public bool checkVariablesInitialization(AbsMiniCRoot root) {
+	bool allVariablesAreInitialized = true;
+
+	// For each variable found...
+	for (/variable(Label variableName) := root) {
+		print(variableName);
+		if (checkVariableInitialization(root, variableName) == false) {
+			return false;
+		}
+	}
+	
+	return allVariablesAreInitialized;
+}
+
+// Check if variables are defined when they are used
+public bool checkVariableInitialization(AbsMiniCRoot root, Label varName) {
+	bool variableUsedIsInitialized = false;
+	
+	// There should be a matching declaration
+	visit(root) {
+		case withoutAssignment(str variableType, Label foundInitVarName): {
+			if (varName == foundInitVarName) {
+				variableUsedIsInitialized = true;
+			}
+		}
+		case withAssignment(str variableType, AbsAssignment variableAssignment): {
+			if (varName == variableAssignment.variableName) {
+				variableUsedIsInitialized = true;
+			}
+		}
+	}
+	
+	return variableUsedIsInitialized;
 }
 
 
