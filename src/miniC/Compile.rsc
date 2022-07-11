@@ -88,20 +88,21 @@ Statement extractFuntion(AbsFunctionCall func) {
 }
 
 Statement extractAssignment(AbsAssignment ass) {
-	if (arithmetic(Label variableName, str assignmentOperator, AbsArithmetic arithmeticValue) := ass) {
+	if (arithmetic(Label variableName, str _, AbsArithmetic arithmeticValue) := ass) {
 		// Return the arithmatic operation performed
 		return Assign([Name(variableName, Store())], extractArithmatic(arithmeticValue));
-	} else if (boolean(Label variableName, str assignmentOperator, AbsComparison booleanValue) := ass) {
+	} else if (boolean(Label variableName, str _, AbsComparison booleanValue) := ass) {
+		// Return the boolean operation performed
 		return Assign([Name(variableName, Store())], extractComparison(booleanValue));
 	}
 	throw "Failed to convert miniC AST to Python AST";
 }
 
 Statement extractDeclaration(AbsDeclaration decl) {
-	if (withoutAssignment(str variableType, Label variableName) := decl) {
+	if (withoutAssignment(str _, Label variableName) := decl) {
 		// Return the variable name with a None value
 		return Assign([Name(variableName, Store())], Constant("None"));
-	} else if (withAssignment(str variableType, AbsAssignment variableAssignment) := decl) {
+	} else if (withAssignment(str _, AbsAssignment variableAssignment) := decl) {
 		// Return the variable name with the corresponding value
 		return extractAssignment(variableAssignment);
 	}
@@ -109,18 +110,21 @@ Statement extractDeclaration(AbsDeclaration decl) {
 }
 
 Statement extractStatement(AbsStatement statement) {
-	// Check the type of statement and extract the corresponding value
 	if (declaration(AbsDeclaration decl) := statement) {
+		// Return the declaration performed
 		return extractDeclaration(decl);
 	} else if (assignment(AbsAssignment ass) := statement) {
+		// Return the assignment performed
 		return extractAssignment(ass);
 	} else if (functionCall(AbsFunctionCall func) := statement) {
+		// Return the functioncall performed
 		return extractFuntion(func);
 	}
 	throw "Failed to convert miniC AST to Python AST";
 }
 
 BinOp extractBinOp(str operator) {
+	// Return the corresponding binary operator
 	switch (operator) {
 		case "&&":
 			return And();
@@ -134,6 +138,7 @@ BinOp extractBinOp(str operator) {
 }
 
 CmpOp extractCmpOp(str operator) {
+	// Return the corresponding compare operator
 	switch (operator) {
 		case "\<":
 			return Lt();
@@ -154,10 +159,13 @@ CmpOp extractCmpOp(str operator) {
 
 Expression extractComparison(AbsComparison comparison) {
 	if (compArithmetic(AbsArithmetic leftValue, str comparisonOperator, AbsArithmetic rightValue) := comparison) {
+		// Return the result of the arithmatic comparison
 		return Compare(extractArithmatic(leftValue), [extractCmpOp(comparisonOperator)], [extractArithmatic(rightValue)]);
 	} else if (compLogical(AbsComparison leftComparison, str logicalOperator, AbsComparison rightComparison) := comparison) {
+		// Return the result of the logical comparison
 		return BoolOp(extractBinOp(logicalOperator), [extractComparison(leftComparison), extractComparison(rightComparison)]);
 	} else if (compNegation(str negation, AbsComparison comp) := comparison) {
+		// Return the result of the negation comparison
 		return UnaryOp(extractBinOp(negation), extractComparison(comp)); 
 	}
 	throw "Failed to convert miniC AST to Python AST";
@@ -165,28 +173,35 @@ Expression extractComparison(AbsComparison comparison) {
 
 Statement extractBody(AbsConstructBody body) {
 	if (nestedStatement(AbsStatement statement) := body) {
+		// Return the nested statement of the body
 		return extractStatement(statement);
 	} else if (nestedConstruct(AbsConstruct construct) := body) {
+		// Return the nested construct of the body
 		return extractConstruct(construct);
 	}
 	throw "Failed to convert miniC AST to Python AST";
 }
 
 Statement extractIfElse(AbsIfConstruct ifStatement, list[AbsElseIfConstruct] elseifStatement, list[AbsElseConstruct] elseStatement) {
+	// Convert the miniC AST-style if-else to the Python AST-style if-else by recursively calling the body on the else function
 	if (ifConstruct(list[AbsIfCondition] ifConditions, list[AbsConstructBody] ifBody) := ifStatement) {
 		if (ifEquality(list[AbsComparison] comp) := ifConditions[0]) {
+			// Extract the comparison and the body from the if-statement
 			Expression expr = extractComparison(comp[0]);
 			list[Statement] body = [ extractBody(B) | AbsConstructBody B <- ifBody ];
 			if (size(elseifStatement) > 0) {
+				// If there are else-ifs remaining, append them recursively to the else-body with an additional if-statement for the if-else condition
 				if (elseIfConstruct(list[AbsIfConstruct] statement) := elseifStatement[0]) {
 					return If(expr, body, [extractIfElse(statement[0], elseifStatement - elseifStatement[0], elseStatement)]);
 				}
 			} else if (size(elseStatement) > 0) {
+				// If there is only an else remaining, append this recursively to the else-body without an if-statement
 				if (elseConstruct(list[AbsConstructBody] elseBody) := elseStatement[0]) {
 					list[Statement] eBody = [ extractBody(B) | AbsConstructBody B <- elseBody ];
 					return If(expr, body, eBody);
 				}
 			} else {
+				// If no elses are remaining, we have ended in our final recursive step, so return without another function call
 				return If(expr, body, []);
 			}
 		}
