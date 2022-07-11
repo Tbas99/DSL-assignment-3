@@ -1,22 +1,28 @@
-#include<stdio.h>
+#include <stdio.h>
 
-/*
- * Program that computes a factorial of the input 
- */
-int main() {
-	int i = 1;
-	int fact = 1;
-	int number;
-	
-	printf("Enter a number: ");
-	scanf("%d", number);
-	
-	for(i=1; i<=number; i = i + 1) {
-		fact = fact*i;
-	}
-	
-	printf("Factorial of input is: ");
-	printf(fact);
-	
-	return 0;
+// A program that computes the factorial of a given number
+int main()
+{
+    int n;
+    int i;
+    int fact = 1;
+    printf("Enter an integer: ");
+    scanf("%d", n);
+    
+    // shows error if the user enters a negative number
+    if (n < 0) {
+        printf("Error! Factorial of a negative number does not exist.");
+    } else {
+        for (i = 1; i <= n; i = i + 1) {
+            fact = fact * i;
+        }
+        
+        // Only one-argument printf's are supported
+        printf("Factorial of");
+        printf(n);
+        printf(" = ");
+        printf(fact);
+    }
+
+    return 0;
 }
