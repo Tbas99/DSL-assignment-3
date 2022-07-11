@@ -248,7 +248,6 @@ Statement extractWhileLoop(AbsWhileLoopConstruct construct) {
 			// Return the constructed while loop
 			return While(expr, pyBody, []);
 		}
-		throw "Failed to convert miniC AST to Python AST";
 	}
 	throw "Failed to convert miniC AST to Python AST";
 }
