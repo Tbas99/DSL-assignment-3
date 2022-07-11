@@ -1,0 +1,31 @@
+#include<stdio.h>  
+
+// Program to determine if the input is a prime
+int main() {
+	int n = 0;
+	int i = 0;
+	int m = 0;
+	int flag = 0;
+	int flag2 = 0;
+
+	printf("Enter the number to check prime:");
+	scanf("%d", n);
+
+	m = n/2;
+
+	for(i = 2; i <= m; i = i + 1)
+	{
+		if(n % i == 0 && flag2 == 0)
+		{
+			printf("Number is not prime");
+			flag = 1;
+			flag2 = 1;
+		}
+	}
+	
+	if (flag == 0) {
+		printf("Number is prime");
+	}
+	
+	return 0;
+ }

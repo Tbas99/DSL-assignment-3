@@ -2,7 +2,7 @@
 from ast import *
 
 # Parse AST to Python
-ast = eval(open("tmp.txt").read())
+ast = eval(open("compilationInput.txt").read())
 
 # Fix missing locations since this otherwise throws <TypeError: required field "lineno" missing from stmt>
 fix_missing_locations(ast)
